@@ -1,0 +1,10 @@
+{
+	"name": "OWAPIkey",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://DS598OWAPI.vault.azure.net/"
+		}
+	}
+}
