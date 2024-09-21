@@ -1,0 +1,22 @@
+{
+	"name": "RestOpenWeather",
+	"properties": {
+		"description": "Called OpenWeatherAPI to get the data",
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://openweathermap.org/api/air-pollution",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Basic",
+			"userName": "RenkH",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "OWAPIkey",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "OpenWeatherAPI"
+			}
+		}
+	}
+}
