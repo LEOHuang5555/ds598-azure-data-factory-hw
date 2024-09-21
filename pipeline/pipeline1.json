@@ -1,6 +1,25 @@
 {
 	"name": "pipeline1",
 	"properties": {
+		"activities": [
+			{
+				"name": "Web1",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://ds598owapi.vault.azure.net/secrets/OpenWeatherAPI/5cb492cc1d2e47bfbc7678aa258c53ca"
+				}
+			}
+		],
 		"annotations": []
 	}
 }
