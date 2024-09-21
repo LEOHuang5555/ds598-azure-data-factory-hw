@@ -5,7 +5,7 @@
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
-			"url": "https://openweathermap.org/api/air-pollution",
+			"url": "https://openweathermap.org/",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Basic",
 			"userName": "RenkH",
