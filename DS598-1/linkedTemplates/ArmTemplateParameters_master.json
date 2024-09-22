@@ -8,6 +8,9 @@
 		"GitHubDS598_credential": {
 			"value": ""
 		},
+		"AzureDataLakeStorage1_accountKey": {
+			"value": ""
+		},
 		"GitHubDS598_properties_typeProperties_username": {
 			"value": "LEOHuang5555"
 		},
@@ -19,6 +22,9 @@
 		},
 		"RestOpenWeather_properties_typeProperties_userName": {
 			"value": "RenkH"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://storageds598.dfs.core.windows.net/"
 		},
 		"containerUri": {
 			"value": ""
