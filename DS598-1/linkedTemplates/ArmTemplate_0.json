@@ -304,11 +304,11 @@
 					},
 					"start": {
 						"type": "string",
-						"defaultValue": "@div(sub(ticks(addDays(utcNow(), mul(-4, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)"
+						"defaultValue": "@div(sub(ticks(addDays(utcNow(), mul(-7, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)"
 					},
 					"end": {
 						"type": "string",
-						"defaultValue": "@div(sub(ticks(addDays(utcNow(), mul(-4, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)"
+						"defaultValue": "@div(sub(ticks(addDays(utcNow(), mul(-7, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)"
 					},
 					"apiKey": {
 						"type": "string",
@@ -359,6 +359,7 @@
 					},
 					{
 						"name": "ForEach1",
+						"description": "Weather",
 						"type": "ForEach",
 						"dependsOn": [
 							{
@@ -435,6 +436,89 @@
 								}
 							]
 						}
+					},
+					{
+						"name": "ForEach2",
+						"description": "Air pollution",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Web1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@range(0, 52)\n",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy data2",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "RestSource",
+											"httpRequestTimeout": "00:01:40",
+											"requestInterval": "00.00:00:00.010",
+											"requestMethod": "GET",
+											"paginationRules": {
+												"supportRFC5988": "true"
+											}
+										},
+										"sink": {
+											"type": "JsonSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "JsonWriteSettings",
+												"filePattern": "setOfObjects"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "RestResource11",
+											"type": "DatasetReference",
+											"parameters": {
+												"lat": 30.7918613,
+												"lon": -83.7898868,
+												"start": {
+													"value": "@div(sub(ticks(addDays(utcNow(), mul(-7, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)",
+													"type": "Expression"
+												},
+												"end": {
+													"value": "@div(sub(ticks(addDays(utcNow(), mul(-7, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)",
+													"type": "Expression"
+												},
+												"apiKey": "@activity('Web1').output.value"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Json1",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									]
+								}
+							]
+						}
 					}
 				],
 				"policy": {
@@ -450,7 +534,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/RestResource1')]",
-				"[concat(variables('factoryId'), '/datasets/Json1')]"
+				"[concat(variables('factoryId'), '/datasets/Json1')]",
+				"[concat(variables('factoryId'), '/datasets/RestResource11')]"
 			]
 		},
 		{
