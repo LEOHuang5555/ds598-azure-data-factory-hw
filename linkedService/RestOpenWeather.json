@@ -5,7 +5,7 @@
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
-			"url": "https://openweathermap.org/",
+			"url": "https://history.openweathermap.org/",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Basic",
 			"userName": "RenkH",
