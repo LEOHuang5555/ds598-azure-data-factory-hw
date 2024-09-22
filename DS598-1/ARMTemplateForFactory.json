@@ -1,0 +1,279 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "DS598-1"
+		},
+		"GitHubDS598_credential": {
+			"type": "secureString",
+			"metadata": "Secure string for 'credential' of 'GitHubDS598'"
+		},
+		"GitHubDS598_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "LEOHuang5555"
+		},
+		"OWAPIkey_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://DS598OWAPI.vault.azure.net/"
+		},
+		"RestOpenWeather_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://openweathermap.org/"
+		},
+		"RestOpenWeather_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "RenkH"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://ds598owapi.vault.azure.net/secrets/OpenWeatherAPI/5cb492cc1d2e47bfbc7678aa258c53ca"
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Web1",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [
+							{
+								"name": "startDate"
+							}
+						],
+						"typeProperties": {
+							"items": {
+								"value": "@range(0, 52)\n",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy data1",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [
+										{
+											"name": "startDate",
+											"value": "@addDays(utcNow(), mul(-7, item()))"
+										},
+										{
+											"name": "endDate",
+											"value": "@addDays(utcNow(), mul(-7, add(item(), 1)))"
+										},
+										{
+											"name": "lat",
+											"value": "30.7918613"
+										},
+										{
+											"name": "lon",
+											"value": "-83.7898868"
+										}
+									],
+									"typeProperties": {
+										"source": {
+											"type": "RestSource",
+											"httpRequestTimeout": "00:01:40",
+											"requestInterval": "00.00:00:00.010",
+											"requestMethod": "GET",
+											"additionalHeaders": {},
+											"paginationRules": {
+												"supportRFC5988": "true"
+											}
+										},
+										"sink": {
+											"type": "RestSink",
+											"httpRequestTimeout": "00:05:00",
+											"requestInterval": 10,
+											"requestMethod": "POST",
+											"writeBatchSize": 10000,
+											"httpCompressionType": "none"
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "RestResource1",
+											"type": "DatasetReference",
+											"parameters": {
+												"lat": 30.7918613,
+												"lon": -83.7898868
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "RestResource1",
+											"type": "DatasetReference",
+											"parameters": {
+												"lat": 30.7918613,
+												"lon": -83.7898868,
+												"start": "@ticks(addDays(utcNow(), mul(-7, item())))",
+												"end": "@ticks(addDays(utcNow(), mul(-7, add(item(), 1))))",
+												"apiKey": "@activity('Web1').output.value"
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"apiKey": {
+						"type": "string",
+						"defaultValue": "@{activity('Web1').output.value}"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/RestResource1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/GitHubDS598')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "For DS598",
+				"annotations": [],
+				"type": "GitHub",
+				"typeProperties": {
+					"username": "[parameters('GitHubDS598_properties_typeProperties_username')]",
+					"credential": {
+						"type": "SecureString",
+						"value": "[parameters('GitHubDS598_credential')]"
+					},
+					"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDc1NjA3OTc3LTMzREMtNDQwNC1BM0UyLUU5RDhBNjAyOUY4Ql9kY2M2ZDE5My1mY2I1LTQyOWQtOWRiOS0wYmYwOTU2MDlmODAiDQp9"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/OWAPIkey')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('OWAPIkey_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RestOpenWeather')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Called OpenWeatherAPI to get the data",
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('RestOpenWeather_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Basic",
+					"userName": "[parameters('RestOpenWeather_properties_typeProperties_userName')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "OWAPIkey",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "OpenWeatherAPI"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/OWAPIkey')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RestResource1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "RestOpenWeather",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"lat": {
+						"type": "float",
+						"defaultValue": 30.7918613
+					},
+					"lon": {
+						"type": "float",
+						"defaultValue": -83.7898868
+					},
+					"start": {
+						"type": "string",
+						"defaultValue": "@ticks(addDays(utcNow(), mul(-7, item())))"
+					},
+					"end": {
+						"type": "string",
+						"defaultValue": "@ticks(addDays(utcNow(), mul(-7, add(item(), 1))))"
+					},
+					"apiKey": {
+						"type": "string",
+						"defaultValue": "@activity('Web1').output.value"
+					}
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": {
+						"value": "data/2.5/history/city?lat=@{dataset().lat}&lon=@{dataset().lon}&type=hour&start=@ticks(addDays(utcNow(), mul(-7, item())))&end=@ticks(addDays(utcNow(), mul(-7, add(item(), 1))))&appid=@{dataset().apiKey}\n",
+						"type": "Expression"
+					}
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/RestOpenWeather')]"
+			]
+		}
+	]
+}
