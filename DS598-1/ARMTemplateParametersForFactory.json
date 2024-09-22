@@ -27,7 +27,7 @@
 			"value": "RenkH"
 		},
 		"RestOpenWeather2_properties_typeProperties_url": {
-			"value": "http://api.openweathermap.org/"
+			"value": "https://api.openweathermap.org/"
 		},
 		"RestOpenWeather2_properties_typeProperties_userName": {
 			"value": "RenkH"

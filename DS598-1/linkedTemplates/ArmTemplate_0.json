@@ -37,7 +37,7 @@
 		},
 		"RestOpenWeather2_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "http://api.openweathermap.org/"
+			"defaultValue": "https://api.openweathermap.org/"
 		},
 		"RestOpenWeather2_properties_typeProperties_userName": {
 			"type": "string",
@@ -304,11 +304,11 @@
 					},
 					"start": {
 						"type": "string",
-						"defaultValue": "@div(sub(ticks(addDays(utcNow(), mul(-7, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)"
+						"defaultValue": "@div(sub(ticks(addDays(utcNow(), mul(-4, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)"
 					},
 					"end": {
 						"type": "string",
-						"defaultValue": "@div(sub(ticks(addDays(utcNow(), mul(-7, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)"
+						"defaultValue": "@div(sub(ticks(addDays(utcNow(), mul(-4, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)"
 					},
 					"apiKey": {
 						"type": "string",
@@ -542,11 +542,11 @@
 												"lat": 30.7918613,
 												"lon": -83.7898868,
 												"start": {
-													"value": "@div(sub(ticks(addDays(utcNow(), mul(-7, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)\n",
+													"value": "@div(sub(ticks(addDays(utcNow(), mul(-4, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)\n",
 													"type": "Expression"
 												},
 												"end": {
-													"value": "@div(sub(ticks(addDays(utcNow(), mul(-7, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)\n",
+													"value": "@div(sub(ticks(addDays(utcNow(), mul(-4, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)\n",
 													"type": "Expression"
 												},
 												"apiKey": {
