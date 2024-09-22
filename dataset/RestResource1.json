@@ -7,12 +7,12 @@
 		},
 		"parameters": {
 			"lat": {
-				"type": "int",
-				"defaultValue": "30.7918613"
+				"type": "float",
+				"defaultValue": 30.7918613
 			},
 			"lon": {
-				"type": "int",
-				"defaultValue": "-83.7898868"
+				"type": "float",
+				"defaultValue": -83.7898868
 			},
 			"start": {
 				"type": "string",
