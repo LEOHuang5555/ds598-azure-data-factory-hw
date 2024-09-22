@@ -5,6 +5,16 @@
 			"referenceName": "RestOpenWeather",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"lat": {
+				"type": "int",
+				"defaultValue": "30.7918613"
+			},
+			"lon": {
+				"type": "int",
+				"defaultValue": "-83.7898868"
+			}
+		},
 		"annotations": [],
 		"type": "RestResource",
 		"typeProperties": {
