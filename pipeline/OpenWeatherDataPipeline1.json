@@ -1,5 +1,5 @@
 {
-	"name": "pipeline1",
+	"name": "OpenWeatherDataPipeline1",
 	"properties": {
 		"activities": [
 			{
@@ -83,7 +83,7 @@
 										"start": "@div(sub(ticks(addDays(utcNow(), mul(-7, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)",
 										"end": "@div(sub(ticks(addDays(utcNow(), mul(-7, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)",
 										"apiKey": {
-											"value": "@activity('Web1').output",
+											"value": "@activity('Web1').output.value",
 											"type": "Expression"
 										}
 									}
