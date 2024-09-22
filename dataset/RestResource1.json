@@ -24,14 +24,14 @@
 			},
 			"apiKey": {
 				"type": "string",
-				"defaultValue": "@{activity('Web1').output.value}"
+				"defaultValue": "@activity('Web1').output.value"
 			}
 		},
 		"annotations": [],
 		"type": "RestResource",
 		"typeProperties": {
 			"relativeUrl": {
-				"value": "data/2.5/history/city?lat=@{dataset().lat}&lon=@{dataset().lon}&type=hour&start=@{dataset().start}&end=@{dataset().end}&appid=\n",
+				"value": "data/2.5/history/city?lat=@{dataset().lat}&lon=@{dataset().lon}&type=hour&start=@ticks(addDays(utcNow(), mul(-7, item())))&end=@ticks(addDays(utcNow(), mul(-7, add(item(), 1))))&appid=@{dataset().apiKey}\n",
 				"type": "Expression"
 			}
 		},
