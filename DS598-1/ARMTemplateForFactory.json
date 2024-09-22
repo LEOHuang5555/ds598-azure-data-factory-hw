@@ -33,7 +33,7 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"name": "[concat(parameters('factoryName'), '/OpenWeatherDataPipeline1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -120,7 +120,7 @@
 												"start": "@div(sub(ticks(addDays(utcNow(), mul(-7, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)",
 												"end": "@div(sub(ticks(addDays(utcNow(), mul(-7, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)",
 												"apiKey": {
-													"value": "@activity('Web1').output",
+													"value": "@activity('Web1').output.value",
 													"type": "Expression"
 												}
 											}
@@ -246,7 +246,7 @@
 					},
 					"apiKey": {
 						"type": "string",
-						"defaultValue": "@activity('Web1').output"
+						"defaultValue": "@activity('Web1').output.value"
 					}
 				},
 				"annotations": [],
@@ -262,6 +262,72 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/RestOpenWeather')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/getKeyVault')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://ds598owapi.vault.azure.net/secrets/OpenWeatherAPI?api-version=7.0",
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "Set variable1",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Web1",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "apiKey",
+									"value": {
+										"type": "String",
+										"content": "@activity('Web1').output.value"
+									}
+								}
+							],
+							"setSystemVariable": true
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
 		}
 	]
 }
