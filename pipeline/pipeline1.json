@@ -30,8 +30,16 @@
 						]
 					}
 				],
-				"userProperties": [],
+				"userProperties": [
+					{
+						"name": "startDate"
+					}
+				],
 				"typeProperties": {
+					"items": {
+						"value": "@range(0, 52)\n",
+						"type": "Expression"
+					},
 					"activities": [
 						{
 							"name": "Copy data1",
@@ -44,7 +52,16 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
-							"userProperties": [],
+							"userProperties": [
+								{
+									"name": "startDate",
+									"value": "@addDays(utcNow(), mul(-7, item()))"
+								},
+								{
+									"name": "endDate",
+									"value": "@addDays(utcNow(), mul(-7, add(item(), 1)))"
+								}
+							],
 							"typeProperties": {
 								"source": {
 									"type": "RestSource",
@@ -55,22 +72,9 @@
 										"supportRFC5988": "true"
 									}
 								},
-								"sink": {
-									"type": "RestSink",
-									"httpRequestTimeout": "00:05:00",
-									"requestInterval": 10,
-									"writeBatchSize": 10000,
-									"httpCompressionType": "none"
-								},
 								"enableStaging": false
 							},
 							"inputs": [
-								{
-									"referenceName": "RestResource1",
-									"type": "DatasetReference"
-								}
-							],
-							"outputs": [
 								{
 									"referenceName": "RestResource1",
 									"type": "DatasetReference"
@@ -81,6 +85,16 @@
 				}
 			}
 		],
+		"variables": {
+			"startDate": {
+				"type": "String",
+				"defaultValue": "@utcNow()"
+			},
+			"endDate": {
+				"type": "String",
+				"defaultValue": "@addDays(@utcNow(), -7)"
+			}
+		},
 		"annotations": []
 	}
 }
