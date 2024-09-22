@@ -30,14 +30,10 @@
 						]
 					}
 				],
-				"userProperties": [
-					{
-						"name": "startDate"
-					}
-				],
+				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@range(0, 52)\n",
+						"value": "@range(0, 52)\n\n",
 						"type": "Expression"
 					},
 					"activities": [
@@ -95,8 +91,14 @@
 									"referenceName": "RestResource1",
 									"type": "DatasetReference",
 									"parameters": {
-										"lat": "30.7918613",
-										"lon": "-83.7898868"
+										"lat": 30.7918613,
+										"lon": -83.7898868,
+										"start": "@div(sub(ticks(addDays(utcNow(), mul(-7, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)",
+										"end": "@div(sub(ticks(addDays(utcNow(), mul(-7, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)",
+										"apiKey": {
+											"value": "@activity('Web1').output",
+											"type": "Expression"
+										}
 									}
 								}
 							],
@@ -105,8 +107,8 @@
 									"referenceName": "RestResource1",
 									"type": "DatasetReference",
 									"parameters": {
-										"lat": "30.7918613",
-										"lon": "-83.7898868",
+										"lat": 30.7918613,
+										"lon": -83.7898868,
 										"start": "@ticks(addDays(utcNow(), mul(-7, item())))",
 										"end": "@ticks(addDays(utcNow(), mul(-7, add(item(), 1))))",
 										"apiKey": "@activity('Web1').output.value"

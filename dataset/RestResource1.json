@@ -16,22 +16,22 @@
 			},
 			"start": {
 				"type": "string",
-				"defaultValue": "@ticks(addDays(utcNow(), mul(-7, item())))"
+				"defaultValue": "@div(sub(ticks(addDays(utcNow(), mul(-7, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)"
 			},
 			"end": {
 				"type": "string",
-				"defaultValue": "@ticks(addDays(utcNow(), mul(-7, add(item(), 1))))"
+				"defaultValue": "@div(sub(ticks(addDays(utcNow(), mul(-7, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)"
 			},
 			"apiKey": {
 				"type": "string",
-				"defaultValue": "@activity('Web1').output.value"
+				"defaultValue": "@activity('Web1').output"
 			}
 		},
 		"annotations": [],
 		"type": "RestResource",
 		"typeProperties": {
 			"relativeUrl": {
-				"value": "data/2.5/history/city?lat=@{dataset().lat}&lon=@{dataset().lon}&type=hour&start=@ticks(addDays(utcNow(), mul(-7, item())))&end=@ticks(addDays(utcNow(), mul(-7, add(item(), 1))))&appid=@activity('Web1').output.value\n",
+				"value": "data/2.5/history/city?lat=@{dataset().lat}&lon=@{dataset().lon}&type=hour&start=@{dataset().start}&end=@{dataset().end}&appid=@{dataset().apiKey}\n",
 				"type": "Expression"
 			}
 		},
