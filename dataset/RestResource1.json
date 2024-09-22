@@ -7,6 +7,9 @@
 		},
 		"annotations": [],
 		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": "data/2.5/history/city?lat=@{dataset().lat}&lon=@{dataset().lon}&type=hour&start=@{ticks(addDays(utcNow(), mul(-7, item())))}&end=@{ticks(addDays(utcNow(), mul(-7, add(item(), 1))))}&appid=<你的API密鑰>"
+		},
 		"schema": []
 	}
 }
