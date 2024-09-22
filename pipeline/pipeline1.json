@@ -60,6 +60,14 @@
 								{
 									"name": "endDate",
 									"value": "@addDays(utcNow(), mul(-7, add(item(), 1)))"
+								},
+								{
+									"name": "lat",
+									"value": "30.7918613"
+								},
+								{
+									"name": "lon",
+									"value": "-83.7898868"
 								}
 							],
 							"typeProperties": {
@@ -77,7 +85,11 @@
 							"inputs": [
 								{
 									"referenceName": "RestResource1",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"lat": "30.7918613",
+										"lon": "-83.7898868"
+									}
 								}
 							]
 						}
@@ -93,6 +105,12 @@
 			"endDate": {
 				"type": "String",
 				"defaultValue": "@addDays(@utcNow(), -7)"
+			},
+			"lat": {
+				"type": "Integer"
+			},
+			"lon": {
+				"type": "Integer"
 			}
 		},
 		"annotations": []
