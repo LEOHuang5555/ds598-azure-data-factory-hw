@@ -97,20 +97,10 @@
 				}
 			}
 		],
-		"variables": {
-			"startDate": {
-				"type": "String",
-				"defaultValue": "@utcNow()"
-			},
-			"endDate": {
-				"type": "String",
-				"defaultValue": "@addDays(@utcNow(), -7)"
-			},
-			"lat": {
-				"type": "Integer"
-			},
-			"lon": {
-				"type": "Integer"
+		"parameters": {
+			"apiKey": {
+				"type": "string",
+				"defaultValue": "@{activity('Web1').output.value}"
 			}
 		},
 		"annotations": []
