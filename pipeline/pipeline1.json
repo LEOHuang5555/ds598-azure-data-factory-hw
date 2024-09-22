@@ -16,7 +16,11 @@
 				"userProperties": [],
 				"typeProperties": {
 					"method": "GET",
-					"url": "https://ds598owapi.vault.azure.net/secrets/OpenWeatherAPI/5cb492cc1d2e47bfbc7678aa258c53ca"
+					"url": "https://ds598owapi.vault.azure.net/secrets/OpenWeatherAPI/5cb492cc1d2e47bfbc7678aa258c53ca",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
 				}
 			},
 			{
