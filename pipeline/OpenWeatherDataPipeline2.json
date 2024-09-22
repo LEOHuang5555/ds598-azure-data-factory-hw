@@ -70,7 +70,8 @@
 										"type": "AzureBlobFSWriteSettings"
 									},
 									"formatSettings": {
-										"type": "JsonWriteSettings"
+										"type": "JsonWriteSettings",
+										"filePattern": "setOfObjects"
 									}
 								},
 								"enableStaging": false
@@ -82,8 +83,14 @@
 									"parameters": {
 										"lat": 30.7918613,
 										"lon": -83.7898868,
-										"start": "@div(sub(ticks(addDays(utcNow(), mul(-7, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)",
-										"end": "@div(sub(ticks(addDays(utcNow(), mul(-7, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)",
+										"start": {
+											"value": "@div(sub(ticks(addDays(utcNow(), mul(-7, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)\n",
+											"type": "Expression"
+										},
+										"end": {
+											"value": "@div(sub(ticks(addDays(utcNow(), mul(-7, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)\n",
+											"type": "Expression"
+										},
 										"apiKey": {
 											"value": "@activity('Web1').output",
 											"type": "Expression"
