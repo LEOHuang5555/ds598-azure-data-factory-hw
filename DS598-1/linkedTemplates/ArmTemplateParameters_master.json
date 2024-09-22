@@ -15,7 +15,7 @@
 			"value": "https://DS598OWAPI.vault.azure.net/"
 		},
 		"RestOpenWeather_properties_typeProperties_url": {
-			"value": "https://openweathermap.org/"
+			"value": "https://history.openweathermap.org/"
 		},
 		"RestOpenWeather_properties_typeProperties_userName": {
 			"value": "RenkH"
