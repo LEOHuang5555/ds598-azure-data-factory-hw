@@ -80,6 +80,14 @@
 										"supportRFC5988": "true"
 									}
 								},
+								"sink": {
+									"type": "RestSink",
+									"httpRequestTimeout": "00:05:00",
+									"requestInterval": 10,
+									"requestMethod": "POST",
+									"writeBatchSize": 10000,
+									"httpCompressionType": "none"
+								},
 								"enableStaging": false
 							},
 							"inputs": [
@@ -89,6 +97,19 @@
 									"parameters": {
 										"lat": "30.7918613",
 										"lon": "-83.7898868"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "RestResource1",
+									"type": "DatasetReference",
+									"parameters": {
+										"lat": "30.7918613",
+										"lon": "-83.7898868",
+										"start": "@ticks(addDays(utcNow(), mul(-7, item())))",
+										"end": "@ticks(addDays(utcNow(), mul(-7, add(item(), 1))))",
+										"apiKey": "@activity('Web1').output.value"
 									}
 								}
 							]
