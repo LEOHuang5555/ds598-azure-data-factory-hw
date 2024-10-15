@@ -156,89 +156,6 @@
 								}
 							]
 						}
-					},
-					{
-						"name": "ForEach2",
-						"description": "Air pollution",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Web1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@range(0, 52)\n",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Copy data2",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "RestSource",
-											"httpRequestTimeout": "00:01:40",
-											"requestInterval": "00.00:00:00.010",
-											"requestMethod": "GET",
-											"paginationRules": {
-												"supportRFC5988": "true"
-											}
-										},
-										"sink": {
-											"type": "JsonSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "JsonWriteSettings",
-												"filePattern": "setOfObjects"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "RestResource11",
-											"type": "DatasetReference",
-											"parameters": {
-												"lat": 30.7918613,
-												"lon": -83.7898868,
-												"start": {
-													"value": "@div(sub(ticks(addDays(utcNow(), mul(-7, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)",
-													"type": "Expression"
-												},
-												"end": {
-													"value": "@div(sub(ticks(addDays(utcNow(), mul(-7, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)",
-													"type": "Expression"
-												},
-												"apiKey": "@activity('Web1').output.value"
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "Json1",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									]
-								}
-							]
-						}
 					}
 				],
 				"policy": {
@@ -254,8 +171,120 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/RestResource1')]",
-				"[concat(variables('factoryId'), '/datasets/Json1')]",
-				"[concat(variables('factoryId'), '/datasets/RestResource11')]"
+				"[concat(variables('factoryId'), '/datasets/Json1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/OpenWeatherDataPipeline2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Air Pollution",
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://ds598owapi.vault.azure.net/secrets/OpenWeatherAPI?api-version=7.0",
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "pollutionData",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Web1",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "RestResource11",
+								"type": "DatasetReference",
+								"parameters": {
+									"lat": 30.7918613,
+									"lon": -83.7898868,
+									"start": {
+										"value": "@div(sub(ticks(utcNow()), ticks(addDays(utcNow(), -365))), 10000000)\n",
+										"type": "Expression"
+									},
+									"end": {
+										"value": "@div(sub(ticks(utcNow()), ticks('1970-01-01T00:00:00Z')), 10000000)\n",
+										"type": "Expression"
+									},
+									"apiKey": "@activity('Web1').output.value"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Json2",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"apiKey": {
+						"type": "string",
+						"defaultValue": "@{activity('Web1').output.value}"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/RestResource11')]",
+				"[concat(variables('factoryId'), '/datasets/Json2')]"
 			]
 		},
 		{
@@ -337,6 +366,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
+						"folderPath": "weather",
 						"fileSystem": "bronze"
 					}
 				},
@@ -389,6 +419,51 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/RestOpenWeather')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RestResource11')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "RestOpenWeather2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"lat": {
+						"type": "float",
+						"defaultValue": 30.7918613
+					},
+					"lon": {
+						"type": "float",
+						"defaultValue": -83.7898868
+					},
+					"start": {
+						"type": "string",
+						"defaultValue": "@div(sub(ticks(utcNow()), ticks(addDays(utcNow(), -365))), 10000000)"
+					},
+					"end": {
+						"type": "string",
+						"defaultValue": "@div(sub(ticks(utcNow()), ticks('1970-01-01T00:00:00Z')), 10000000)"
+					},
+					"apiKey": {
+						"type": "string",
+						"defaultValue": "@activity('Web1').output.value"
+					}
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": {
+						"value": "data/2.5/air_pollution/history?lat=@{dataset().lat}&lon=@{dataset().lon}&start=@{dataset().start}&end=@{dataset().end}&appid=@{dataset().apiKey}",
+						"type": "Expression"
+					}
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/RestOpenWeather2')]"
 			]
 		},
 		{
@@ -495,179 +570,27 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/RestResource11')]",
+			"name": "[concat(parameters('factoryName'), '/Json2')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "RestOpenWeather2",
+					"referenceName": "AzureDataLakeStorage1",
 					"type": "LinkedServiceReference"
 				},
-				"parameters": {
-					"lat": {
-						"type": "float",
-						"defaultValue": 30.7918613
-					},
-					"lon": {
-						"type": "float",
-						"defaultValue": -83.7898868
-					},
-					"start": {
-						"type": "string",
-						"defaultValue": "@div(sub(ticks(addDays(utcNow(), mul(-7, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)"
-					},
-					"end": {
-						"type": "string",
-						"defaultValue": "@div(sub(ticks(addDays(utcNow(), mul(-7, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)"
-					},
-					"apiKey": {
-						"type": "string",
-						"defaultValue": "@activity('Web1').output.value"
-					}
-				},
 				"annotations": [],
-				"type": "RestResource",
+				"type": "Json",
 				"typeProperties": {
-					"relativeUrl": {
-						"value": "data/2.5/air_pollution/history?lat=@{dataset().lat}&lon=@{dataset().lon}&start=@{dataset().start}&end=@{dataset().end}&appid=@{dataset().apiKey}",
-						"type": "Expression"
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "pollution",
+						"fileSystem": "bronze"
 					}
 				},
-				"schema": []
+				"schema": {}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/RestOpenWeather2')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/OpenWeatherDataPipeline2')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Air Pollution",
-				"activities": [
-					{
-						"name": "Web1",
-						"type": "WebActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"method": "GET",
-							"headers": {},
-							"url": "https://ds598owapi.vault.azure.net/secrets/OpenWeatherAPI?api-version=7.0",
-							"authentication": {
-								"type": "MSI",
-								"resource": "https://vault.azure.net"
-							}
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Web1",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@range(0, 52)\n\n",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Copy data1",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "RestSource",
-											"httpRequestTimeout": "00:01:40",
-											"requestInterval": "00.00:00:00.010",
-											"requestMethod": "GET",
-											"paginationRules": {
-												"supportRFC5988": "true"
-											}
-										},
-										"sink": {
-											"type": "JsonSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "JsonWriteSettings",
-												"filePattern": "setOfObjects"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "RestResource11",
-											"type": "DatasetReference",
-											"parameters": {
-												"lat": 30.7918613,
-												"lon": -83.7898868,
-												"start": {
-													"value": "@div(sub(ticks(addDays(utcNow(), mul(-4, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)\n",
-													"type": "Expression"
-												},
-												"end": {
-													"value": "@div(sub(ticks(addDays(utcNow(), mul(-4, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)\n",
-													"type": "Expression"
-												},
-												"apiKey": {
-													"value": "@activity('Web1').output.value",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "Json1",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"apiKey": {
-						"type": "string",
-						"defaultValue": "@{activity('Web1').output.value}"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/RestResource11')]",
-				"[concat(variables('factoryId'), '/datasets/Json1')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
 			]
 		}
 	]

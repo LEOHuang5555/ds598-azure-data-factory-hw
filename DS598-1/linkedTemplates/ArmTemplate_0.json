@@ -176,6 +176,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
+						"folderPath": "weather",
 						"fileSystem": "bronze"
 					}
 				},
@@ -237,6 +238,30 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/OWAPIkey')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Json2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "pollution",
+						"fileSystem": "bronze"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
 			]
 		},
 		{
@@ -304,11 +329,11 @@
 					},
 					"start": {
 						"type": "string",
-						"defaultValue": "@div(sub(ticks(addDays(utcNow(), mul(-7, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)"
+						"defaultValue": "@div(sub(ticks(utcNow()), ticks(addDays(utcNow(), -365))), 10000000)"
 					},
 					"end": {
 						"type": "string",
-						"defaultValue": "@div(sub(ticks(addDays(utcNow(), mul(-7, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)"
+						"defaultValue": "@div(sub(ticks(utcNow()), ticks('1970-01-01T00:00:00Z')), 10000000)"
 					},
 					"apiKey": {
 						"type": "string",
@@ -437,89 +462,6 @@
 								}
 							]
 						}
-					},
-					{
-						"name": "ForEach2",
-						"description": "Air pollution",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Web1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@range(0, 52)\n",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Copy data2",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "RestSource",
-											"httpRequestTimeout": "00:01:40",
-											"requestInterval": "00.00:00:00.010",
-											"requestMethod": "GET",
-											"paginationRules": {
-												"supportRFC5988": "true"
-											}
-										},
-										"sink": {
-											"type": "JsonSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "JsonWriteSettings",
-												"filePattern": "setOfObjects"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "RestResource11",
-											"type": "DatasetReference",
-											"parameters": {
-												"lat": 30.7918613,
-												"lon": -83.7898868,
-												"start": {
-													"value": "@div(sub(ticks(addDays(utcNow(), mul(-7, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)",
-													"type": "Expression"
-												},
-												"end": {
-													"value": "@div(sub(ticks(addDays(utcNow(), mul(-7, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)",
-													"type": "Expression"
-												},
-												"apiKey": "@activity('Web1').output.value"
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "Json1",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									]
-								}
-							]
-						}
 					}
 				],
 				"policy": {
@@ -535,8 +477,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/RestResource1')]",
-				"[concat(variables('factoryId'), '/datasets/Json1')]",
-				"[concat(variables('factoryId'), '/datasets/RestResource11')]"
+				"[concat(variables('factoryId'), '/datasets/Json1')]"
 			]
 		},
 		{
@@ -569,8 +510,8 @@
 						}
 					},
 					{
-						"name": "ForEach1",
-						"type": "ForEach",
+						"name": "pollutionData",
+						"type": "Copy",
 						"dependsOn": [
 							{
 								"activity": "Web1",
@@ -579,79 +520,61 @@
 								]
 							}
 						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
-							"items": {
-								"value": "@range(0, 52)\n\n",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Copy data1",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "RestSource",
-											"httpRequestTimeout": "00:01:40",
-											"requestInterval": "00.00:00:00.010",
-											"requestMethod": "GET",
-											"paginationRules": {
-												"supportRFC5988": "true"
-											}
-										},
-										"sink": {
-											"type": "JsonSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "JsonWriteSettings",
-												"filePattern": "setOfObjects"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "RestResource11",
-											"type": "DatasetReference",
-											"parameters": {
-												"lat": 30.7918613,
-												"lon": -83.7898868,
-												"start": {
-													"value": "@div(sub(ticks(addDays(utcNow(), mul(-4, add(item(), 1)))), ticks('1970-01-01T00:00:00Z')), 10000000)\n",
-													"type": "Expression"
-												},
-												"end": {
-													"value": "@div(sub(ticks(addDays(utcNow(), mul(-4, item()))), ticks('1970-01-01T00:00:00Z')), 10000000)\n",
-													"type": "Expression"
-												},
-												"apiKey": {
-													"value": "@activity('Web1').output.value",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "Json1",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									]
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
 								}
-							]
-						}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "RestResource11",
+								"type": "DatasetReference",
+								"parameters": {
+									"lat": 30.7918613,
+									"lon": -83.7898868,
+									"start": {
+										"value": "@div(sub(ticks(utcNow()), ticks(addDays(utcNow(), -365))), 10000000)\n",
+										"type": "Expression"
+									},
+									"end": {
+										"value": "@div(sub(ticks(utcNow()), ticks('1970-01-01T00:00:00Z')), 10000000)\n",
+										"type": "Expression"
+									},
+									"apiKey": "@activity('Web1').output.value"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Json2",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
 					}
 				],
 				"policy": {
@@ -667,7 +590,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/RestResource11')]",
-				"[concat(variables('factoryId'), '/datasets/Json1')]"
+				"[concat(variables('factoryId'), '/datasets/Json2')]"
 			]
 		}
 	]
