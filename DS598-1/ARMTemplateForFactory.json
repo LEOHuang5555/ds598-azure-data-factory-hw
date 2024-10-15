@@ -53,7 +53,7 @@
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "Weather&Air pollution",
+				"description": "Weather",
 				"activities": [
 					{
 						"name": "Web1",
@@ -696,7 +696,7 @@
 									],
 									"outputs": [
 										{
-											"referenceName": "Json1",
+											"referenceName": "Json2",
 											"type": "DatasetReference",
 											"parameters": {}
 										}
@@ -719,7 +719,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/RestResource11')]",
-				"[concat(variables('factoryId'), '/datasets/Json1')]"
+				"[concat(variables('factoryId'), '/datasets/Json2')]"
 			]
 		}
 	]
