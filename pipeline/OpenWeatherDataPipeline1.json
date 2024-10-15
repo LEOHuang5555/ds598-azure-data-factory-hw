@@ -1,7 +1,7 @@
 {
 	"name": "OpenWeatherDataPipeline1",
 	"properties": {
-		"description": "Weather&Air pollution",
+		"description": "Weather",
 		"activities": [
 			{
 				"name": "Web1",
