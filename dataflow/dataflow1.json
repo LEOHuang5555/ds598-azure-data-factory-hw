@@ -24,6 +24,12 @@
 				{
 					"name": "derivedColumn1",
 					"description": "Timestamp Correction"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "derivedColumn2"
 				}
 			],
 			"scriptLines": [
@@ -80,7 +86,15 @@
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> flatten1",
 				"flatten1 derive(corrected_timestamp = iif(length(timestamp)>10, null(), timestamp),",
-				"          location = 'Boston') ~> derivedColumn1"
+				"          location = 'Boston') ~> derivedColumn1",
+				"derivedColumn1 filter(and(",
+				"    !isNull(temperature), ",
+				"    !isNull(humidity), ",
+				"    !isNull(timestamp), ",
+				"    isNull(corrected_timestamp)",
+				")",
+				") ~> filter1",
+				"filter1 derive() ~> derivedColumn2"
 			]
 		}
 	}
