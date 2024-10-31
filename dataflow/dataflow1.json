@@ -20,6 +20,10 @@
 			"transformations": [
 				{
 					"name": "flatten1"
+				},
+				{
+					"name": "derivedColumn1",
+					"description": "Timestamp Correction"
 				}
 			],
 			"scriptLines": [
@@ -74,7 +78,9 @@
 				"               wind_speed = $$)",
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
-				"     skipDuplicateMapOutputs: false) ~> flatten1"
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 derive(corrected_timestamp = iif(length(timestamp)>10, null(), timestamp),",
+				"          location = 'Boston') ~> derivedColumn1"
 			]
 		}
 	}
