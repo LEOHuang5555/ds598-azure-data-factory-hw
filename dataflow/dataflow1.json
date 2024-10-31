@@ -29,7 +29,8 @@
 					"name": "filter1"
 				},
 				{
-					"name": "derivedColumn2"
+					"name": "derivedColumn2",
+					"description": "Converting column types"
 				}
 			],
 			"scriptLines": [
@@ -94,7 +95,22 @@
 				"    isNull(corrected_timestamp)",
 				")",
 				") ~> filter1",
-				"filter1 derive() ~> derivedColumn2"
+				"filter1 derive({date_time } = toTimestamp(toLong(corrected_timestamp * 1000)),",
+				"          id = concat(location, corrected_timestamp),",
+				"          temp_C = round(temp - 273.15)",
+				",",
+				"          temp_min_C = round(temp_min - 273.15),",
+				"          temp_max_C = round(temp_max - 273.15),",
+				"          feels_like_C = round(feels_like - 273.15),",
+				"          feels_like_F = round((feels_like - 273.15) * 9/5 + 32),",
+				"          temp_min_F = round((temp_min - 273.15) * 9/5 + 32),",
+				"          temp_max_F = round((temp_max - 273.15) * 9/5 + 32),",
+				"          lon = -71.0589,",
+				"          lat = 42.3601,",
+				"          weather_id_value = toInteger(split(weather_id, ': ')[1]),",
+				"          weather_main_value = trim(split(weather_main, ': ')[1]),",
+				"          weather_description_value = trim(split(weather_description, ': ')[1]),",
+				"          weather_icon_value = trim(split(weather_icon, ': ')[1])) ~> derivedColumn2"
 			]
 		}
 	}
