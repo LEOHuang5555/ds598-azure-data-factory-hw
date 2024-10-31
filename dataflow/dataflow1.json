@@ -10,6 +10,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "WeatherData"
+				},
+				{
+					"dataset": {
+						"referenceName": "Json1",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
 				}
 			],
 			"sinks": [
@@ -38,6 +45,12 @@
 				},
 				{
 					"name": "select1"
+				},
+				{
+					"name": "flatten2"
+				},
+				{
+					"name": "derivedColumn3"
 				}
 			],
 			"scriptLines": [
@@ -54,6 +67,19 @@
 				"     ignoreNoFilesFound: false,",
 				"     documentForm: 'documentPerLine',",
 				"     wildcardPaths:['/*.json']) ~> WeatherData",
+				"source(output(",
+				"          message as string,",
+				"          cod as string,",
+				"          city_id as integer,",
+				"          calctime as double,",
+				"          cnt as integer,",
+				"          list as (dt as integer, main as (temp as double, feels_like as double, pressure as integer, humidity as integer, temp_min as double, temp_max as double), wind as (speed as double, deg as integer), clouds as (all as integer), weather as (id as integer, main as string, description as string, icon as string)[])[]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'documentPerLine',",
+				"     wildcardPaths:['/*.json']) ~> source1",
 				"WeatherData foldDown(unroll(, list),",
 				"     mapColumn(",
 				"          every(match(name == 'calctime'),",
@@ -84,7 +110,7 @@
 				"               'temp_min' = $$),",
 				"          each(match(name == 'list.weather.description'),",
 				"               'weather_description' = $$),",
-				"          each(match(flatten(list, weather)),",
+				"          each(match(name == 'list.weather.icon'),",
 				"               'weather_icon' = $$),",
 				"          each(match(name == 'list.weather.id'),",
 				"               'weather_id' = $$),",
@@ -153,6 +179,32 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
+				"source1 foldDown(unrollMultiple(list,list.weather),",
+				"     mapColumn(",
+				"          message,",
+				"          cod,",
+				"          city_id,",
+				"          calctime,",
+				"          cnt,",
+				"          list",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten2",
+				"flatten2 derive(wind_speed = list.wind.speed,",
+				"          cod = cod,",
+				"          city_id = city_id,",
+				"          cnt = cnt,",
+				"          calctime = calctime,",
+				"          timestamp = list.dt,",
+				"          message = message,",
+				"          clouds_all = list.clouds.all,",
+				"          feels_like = list.main.feels_like,",
+				"          humidity = list.main.humidity,",
+				"          pressure = list.main.pressure,",
+				"          temp = list.main.temp,",
+				"          temp_max = list.main.temp_max,",
+				"          temp_min = list.main.temp_min,",
+				"          weather_description = list.weather.description) ~> derivedColumn3",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
