@@ -940,7 +940,7 @@
 						"     validateSchema: false,",
 						"     ignoreNoFilesFound: false,",
 						"     documentForm: 'documentPerLine',",
-						"     wildcardPaths:['/*.json']) ~> source1",
+						"     wildcardPaths:[('bronze/weather/*.json')]) ~> source1",
 						"source1 foldDown(unrollMultiple(list,list.weather),",
 						"     mapColumn(",
 						"          message,",
