@@ -16,7 +16,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "Parquet1",
+						"referenceName": "Parquet2",
 						"type": "DatasetReference"
 					},
 					"name": "sink2"
@@ -83,12 +83,9 @@
 				"          pm10 = round(pm10, 2),",
 				"          nh3 = round(nh3, 2)) ~> derivedColumn4",
 				"derivedColumn4 select(mapColumn(",
-				"          coord,",
-				"          list,",
 				"          lon,",
 				"          lat,",
 				"          aqi,",
-				"          timestamp,",
 				"          co,",
 				"          no,",
 				"          no2,",
@@ -97,7 +94,6 @@
 				"          pm2_5,",
 				"          pm10,",
 				"          nh3,",
-				"          corrected_timestamp,",
 				"          location,",
 				"          date_time,",
 				"          id",
